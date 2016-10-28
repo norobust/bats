@@ -15,6 +15,12 @@ if [ "$1" = "-x" ]; then
   shift
 fi
 
+BATS_EXIT_ON_ERROR=""
+if [ "$1" = "-e" ]; then
+  BATS_EXIT_ON_ERROR="$1"
+  shift
+fi
+
 BATS_TEST_FILENAME="$1"
 if [ -z "$BATS_TEST_FILENAME" ]; then
   echo "usage: bats-exec <filename>" >&2
@@ -273,6 +279,9 @@ bats_perform_tests() {
   status=0
   for test_name in "$@"; do
     "$0" $BATS_EXTENDED_SYNTAX "$BATS_TEST_FILENAME" "$test_name" "$test_number" || status=1
+    if [ $status -eq 1 -a -n "$BATS_EXIT_ON_ERROR" ]; then
+      exit $status
+    fi
     let test_number+=1
   done
   exit "$status"

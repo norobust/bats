@@ -7,7 +7,7 @@ version() {
 
 usage() {
   version
-  echo "Usage: bats [-c] [-p | -t] <test> [<test> ...]"
+  echo "Usage: bats [-c] [-p | -t] [-e] <test> [<test> ...]"
 }
 
 help() {
@@ -20,6 +20,7 @@ help() {
   echo "  -h, --help     Display this help message"
   echo "  -p, --pretty   Show results in pretty format (default for terminals)"
   echo "  -t, --tap      Show results in TAP format"
+  echo "  -e             Exit when a test failed"
   echo "  -v, --version  Display the version number"
   echo
   echo "  For more information, see https://github.com/sstephenson/bats"
@@ -99,6 +100,9 @@ for option in "${options[@]}"; do
   "p" | "pretty" )
     pretty="1"
     ;;
+  "e")
+    exit_on_error="-e"
+    ;;
   * )
     usage >&2
     exit 1
@@ -139,4 +143,4 @@ else
 fi
 
 set -o pipefail execfail
-exec "$command" $count_flag $extended_syntax_flag "${filenames[@]}" | "$formatter"
+exec "$command" $count_flag $extended_syntax_flag $exit_on_error "${filenames[@]}" | "$formatter"
